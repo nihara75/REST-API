@@ -1,0 +1,20 @@
+Database:MySQL
+
+I used two relations Books and Review to store data.
+
+Books table contains a bookname column and an authorname column.
+
+COMMAND
+
+    *Create Table BooksL( Books VARCHAR(50), Author VARCHAR(30));
+
+
+
+
+
+
+Review table contains bookname column and review column
+
+COMMAND
+  
+    *Create Table ReviewsL (Books VARCHAR(50) , Review VARCHAR(10000));    
