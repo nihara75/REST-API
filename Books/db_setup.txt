@@ -1,20 +1,28 @@
 Database:MySQL
 
-I used two relations Books and Review to store data.
+I used three relations Author,Books and Reviews to store data.
 
-Books table contains a bookname column and an authorname column.
-
+Author table
 COMMAND
 
-    *Create Table BooksL( Books VARCHAR(50), Author VARCHAR(30));
+   CREATE TABLE Author(authid INT NOT NULL AUTO_INCREMENT,authname VARCHAR(25),PRIMARY KEY(authid));
 
 
-
-
-
-
-Review table contains bookname column and review column
-
+Books TABLE
 COMMAND
-  
-    *Create Table ReviewsL (Books VARCHAR(50) , Review VARCHAR(10000));    
+
+CREATE TABLE Books(bookid INT NOT NULL AUTO_INCREMENT,bookname VARCHAR(50),
+genre VARCHAR(25),authid INT,PRIMARY KEY(bookid),
+CONSTRAINT fk FOREIGN KEY(authid)
+ REFERENCES Author(authid) ON DELETE CASCADE);
+
+
+
+
+
+Review table
+COMMAND
+
+CREATE TABLE Reviews( reviewid INT NOT NULL AUTO_INCREMENT,bookid INT,
+review VARCHAR(1000),PRIMARY KEY(reviewid),CONSTRAINT fr FOREIGN KEY(bookid)
+REFERENCES Books(bookid) ON DELETE CASCADE);

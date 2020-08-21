@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 const con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'yourpassword',
+    password: 'Nihar@25*',
     database: 'Books'  //your db name
 });
 
@@ -22,17 +22,123 @@ con.connect(function(err) {
 });
 
 
-//Three routes are used .Home route to display booklist along with their authors.
-//Bookname route to display a particular book plus its review.
-//Authorname route to display a particular authorname along with his books.
+
+
+//Book routes.
+
+
+app.get("/book",function(req,res){
+  console.log("kui");
+  const authid=req.query.authid;
+  if(authid){
 
 
 
 
-app.get("/",function(req,res){
+     console.log(authid);
+    con.query('SELECT bookname FROM Books WHERE authid=?',[authid], (err,rows,fields) => {
+      if(err) throw err;
+
+      console.log('Data received from Db:');
+      console.log(rows);
+    });
+
+  }
+  else{
+
+  con.query('SELECT bookname FROM Books', (err,rows,fields) => {
+    if(err) throw err;
+
+    console.log('Data received from Db:');
+    console.log(rows);
+  });
+}
+
+});
+
+
+
+app.get("/book/:bookid",function(req,res){
+const name=req.params.bookid;
+
+con.query('SELECT bookname,genre FROM Books WHERE bookid=?',[name], (err,rows,fields) => {
+  if(err) throw err;
+
+  console.log('Data received from Db:');
+  console.log(rows);
+});
+
+
+});
+
+
+app.post("/book",function(req,res){
+
+const bookn=req.body.bookn;
+ const genre=req.body.genre;
+ const id=req.body.authid;
+
+
+  con.query('INSERT INTO Books (bookname,genre,authid) VALUES (?,?,?) ',[bookn,genre,id], (err,rows,fields) => {
+    if(err) throw err;
+
+    console.log('Data received from Db:');
+    console.log(rows);
+  });
+
+
+});
+
+app.delete("/book/:bookid",function(req,res){
+
+  const id=req.params.bookid;
+
+  con.query('DELETE FROM Books WHERE bookid=?',[id], (err,rows,fields) => {
+    if(err) throw err;
+
+    console.log('Data received from Db:');
+    console.log(rows);
+  });
+
+
+});
+
+app.put("/book/:bookid",function(req,res){
+  const bookn=req.params.bookid;
+  const bookname=req.body.bookname;
+  const genre=req.body.genre;
+
+  con.query('UPDATE Books SET bookname=? ,genre=? WHERE bookid=? ',[bookname,genre,bookn], (err,rows,fields) => {
+    if(err) throw err;
+
+    console.log('Data received from Db:');
+    console.log(rows);
+  });
+
+});
+
+
+
+//Review routes.
+
+app.get("/review",function(req,res){
   console.log("Hey world!");
 
-  con.query('SELECT * FROM BooksL', (err,rows,fields) => {
+  const bookid=req.query.bookid;
+  if(bookid){
+
+
+
+
+    con.query('SELECT review FROM Reviews WHERE bookid=?',[bookid], (err,rows,fields) => {
+      if(err) throw err;
+
+      console.log('Data received from Db:');
+      console.log(rows);
+    });
+  }
+else{
+  con.query('SELECT review FROM Reviews', (err,rows,fields) => {
     if(err) throw err;
 
     console.log('Data received from Db:');
@@ -40,45 +146,7 @@ app.get("/",function(req,res){
   });
 
 
-});
-
-app.post("/",function(req,res){
-
-  const bookn=req.body.bookname;
-  const authorn=req.body.authorname;
-  con.query('INSERT INTO BooksL VALUES (?,?) ',[bookn,authorn], (err,rows,fields) => {
-    if(err) throw err;
-
-    console.log('Data received from Db:');
-    console.log(rows);
-  });
-
-
-});
-
-app.delete("/",function(req,res){
-
-  const bookn=req.body.bookname;
-
-  con.query('DELETE FROM BooksL WHERE Books=?',[bookn], (err,rows,fields) => {
-    if(err) throw err;
-
-    console.log('Data received from Db:');
-    console.log(rows);
-  });
-
-});
-
-app.patch("/",function(req,res){
-  const cond=req.body.condition;
-  const bookn=req.body.bookname;
-  const authorn=req.body.authorname;
-  con.query('UPDATE BooksL SET Books=? ,Author=? WHERE Books=? ',[bookn,authorn,cond], (err,rows,fields) => {
-    if(err) throw err;
-
-    console.log('Data received from Db:');
-    console.log(rows);
-  });
+}
 
 });
 
@@ -86,10 +154,10 @@ app.patch("/",function(req,res){
 
 
 
-app.get("/books/:bookname",function(req,res){
-const name=req.params.bookname;
+app.get("/review/:reviewid",function(req,res){
+const name=req.params.reviewid;
 
-con.query('SELECT * FROM ReviewsL WHERE Books=?',[name], (err,rows,fields) => {
+con.query('SELECT review FROM Reviews WHERE reviewid=?',[name], (err,rows,fields) => {
   if(err) throw err;
 
   console.log('Data received from Db:');
@@ -99,13 +167,13 @@ con.query('SELECT * FROM ReviewsL WHERE Books=?',[name], (err,rows,fields) => {
 
 });
 
-app.post("/books/:bookname",function(req,res){
+app.post("/review",function(req,res){
 
-const bookn=req.body.bookn;
- const review=req.body.review;
+const review=req.body.review;
+const bookid=req.body.bookid;
 
 
-  con.query('INSERT INTO ReviewsL VALUES (?,?) ',[bookn,review], (err,rows,fields) => {
+  con.query('INSERT INTO Reviews (bookid,review) VALUES (?,?) ',[bookid,review], (err,rows,fields) => {
     if(err) throw err;
 
     console.log('Data received from Db:');
@@ -115,11 +183,11 @@ const bookn=req.body.bookn;
 
 });
 
-app.delete("/books/:bookname",function(req,res){
+app.delete("/review/:reviewid",function(req,res){
 
-  const review=req.body.review;
+  const id=req.params.reviewid;
 
-  con.query('DELETE FROM ReviewsL WHERE Review=?',[review], (err,rows,fields) => {
+  con.query('DELETE FROM Reviews WHERE reviewid=?',[id], (err,rows,fields) => {
     if(err) throw err;
 
     console.log('Data received from Db:');
@@ -129,12 +197,11 @@ app.delete("/books/:bookname",function(req,res){
 
 });
 
-app.patch("/books/:bookname",function(req,res){
-  const bookn=req.params.bookname;
-  const cond=req.body.condition;
-  const review=req.body.review;
-
-  con.query('UPDATE ReviewsL SET Books=? ,Review=? WHERE Review=? ',[bookn,review,cond], (err,rows,fields) => {
+app.put("/review/:reviewid",function(req,res){
+const id=req.params.reviewid;
+const review=req.body.review;
+//const bookid=req.body.bookid;
+  con.query('UPDATE Reviews SET review=? WHERE reviewid=? ',[review,id], (err,rows,fields) => {
     if(err) throw err;
 
     console.log('Data received from Db:');
@@ -146,11 +213,29 @@ app.patch("/books/:bookname",function(req,res){
 
 
 
+//Author routes.
 
-app.get("/author/:authname",function(req,res){
-const name=req.params.authname;
 
-con.query('SELECT Books FROM BooksL WHERE Author=?',[name], (err,rows,fields) => {
+
+
+app.get("/author",function(req,res){
+  console.log("Hey world!");
+
+  con.query('SELECT authname FROM Author', (err,rows,fields) => {
+    if(err) throw err;
+
+    console.log('Data received from Db:');
+    console.log(rows);
+  });
+
+
+});
+
+
+app.get("/author/:authorid",function(req,res){
+const id=req.params.authorid;
+
+con.query('SELECT authname FROM Author  WHERE authid=?',[id], (err,rows,fields) => {
   if(err) throw err;
 
   console.log('Data received from Db:');
@@ -161,13 +246,12 @@ con.query('SELECT Books FROM BooksL WHERE Author=?',[name], (err,rows,fields) =>
 });
 
 
-app.post("/author/:authname",function(req,res){
+app.post("/author",function(req,res){
 
-const bookn=req.body.bookn;
- const authn=req.body.authn;
+const authn=req.body.authorname;
 
 
-  con.query('INSERT INTO BooksL VALUES (?,?) ',[bookn,authn], (err,rows,fields) => {
+  con.query('INSERT INTO Author (authname) VALUES (?) ',[authn], (err,rows,fields) => {
     if(err) throw err;
 
     console.log('Data received from Db:');
@@ -177,11 +261,11 @@ const bookn=req.body.bookn;
 
 });
 
-app.delete("/author/:authname",function(req,res){
+app.delete("/author/:authorid",function(req,res){
 
-  const bookn=req.body.bookn;
+  const id=req.params.authorid;
 
-  con.query('DELETE FROM BooksL WHERE Books=?',[bookn], (err,rows,fields) => {
+  con.query('DELETE FROM Author WHERE authid=?',[id], (err,rows,fields) => {
     if(err) throw err;
 
     console.log('Data received from Db:');
@@ -191,13 +275,10 @@ app.delete("/author/:authname",function(req,res){
 
 });
 
-
-app.patch("/author/:authname",function(req,res){
-  const bookn=req.body.bookname;
-  const cond=req.body.condition;
-  const authorn=req.params.authname;
-
-  con.query('UPDATE BooksL SET Books=? ,Author=? WHERE Books=? ',[bookn,authorn,cond], (err,rows,fields) => {
+app.put("/author/:authorid",function(req,res){
+  const name=req.body.authorname;
+  const id=req.params.authorid;
+  con.query('UPDATE Author SET authname=? WHERE authid=? ',[name,id], (err,rows,fields) => {
     if(err) throw err;
 
     console.log('Data received from Db:');
@@ -205,6 +286,16 @@ app.patch("/author/:authname",function(req,res){
   });
 
 });
+
+
+
+
+
+
+
+
+
+
 
 
 
